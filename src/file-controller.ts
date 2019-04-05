@@ -1,4 +1,5 @@
 import * as fs from 'fs';
+import * as path from 'path';
 
 export class FileController {
 
@@ -15,7 +16,6 @@ const route = `;
   private testContent = `
 
 it('Invalid routing', async () => {
-  console.log(process.env.OFLOW_ENV);
   try {
     const res = await chai.request(app).get(route + '/unknownrouting');
   } catch (err) {
@@ -24,7 +24,9 @@ it('Invalid routing', async () => {
 });
 `;
 
-  constructor(private currentDir: string) {
+  constructor(
+    private currentDir: string,
+    private currentFile: string) {
 
   }
 
@@ -33,60 +35,34 @@ it('Invalid routing', async () => {
     let rootRouteMatch = fileContent.match(rootRoutePattern) || [];
     this.rootRouteContent = rootRouteMatch[0];
 
-    let putContent = this.buildPutTestContent(fileContent);
-    let getContent = this.buildGetTestContent(fileContent);
-    let postContent = this.buildPostTestContent(fileContent);
-    let deleteContent = this.buildDeleteTestContent(fileContent);
+    let httpMethodsTestContent = this.buildTestContent(fileContent);
 
 
-    const fullTestContent = `${this.importContent}${this.rootRouteContent}${this.testContent}${getContent}${putContent}${postContent}${deleteContent}`;
+    const fullTestContent = `${this.importContent}${this.rootRouteContent}${this.testContent}${httpMethodsTestContent}`;
     fs.writeFile(`${this.currentDir}/../../test/${testFileName}`, fullTestContent, function (err) { console.log(err); });
   }
 
-  private buildGetTestContent(fileContent: string) {
-    let getRoutePattern = /router\.get\(\'.*\'/ig;
-    const getRoutes = fileContent.match(getRoutePattern) || [];
+  private buildTestContent(fileContent: string) {
+    let httpMethods = [
+      { method: 'Get', routePattern: /router\.get\(\'.*\'/ig },
+      { method: 'Put', routePattern: /router\.put\(\'.*\'/ig },
+      { method: 'Post', routePattern: /router\.post\(\'.*\'/ig }
+    ];
     let testContent = '';
-    getRoutes.map((route) => {
-      let testRoute = route.split('(')[1];
-      testContent += this.populateGetTestConent(testRoute);
+    let self = this;
+    httpMethods.map((item) => {
+      const routePattern = item.routePattern;
+      const getRoutes = fileContent.match(routePattern) || [];
+      getRoutes.map((route) => {
+        let testRoute = route.split('(')[1];
+        let populateMethod = `populate${item.method}TestContent`;
+        testContent += (self as any)[populateMethod](testRoute);
+      });
     });
     return testContent;
   }
 
-  private buildPutTestContent(fileContent: string) {
-    let putRoutePattern = /router\.put\(\'.*\'/ig;
-    const putRoutes = fileContent.match(putRoutePattern) || [];
-    let testContent = '';
-    putRoutes.map((route) => {
-      let testRoute = route.split('(')[1];
-      testContent += this.populatePutTestContent(testRoute);
-    });
-    return testContent;
-  }
-
-  private buildPostTestContent(fileContent: string) {
-    let postRoutePattern = /router\.post\(\'.*\'/ig;
-    const postRoutes = fileContent.match(postRoutePattern) || [];
-    let testContent = '';
-    postRoutes.map((route) => {
-      let testRoute = route.split('(')[1];
-      testContent += this.populatePostTestContent(testRoute);
-    });
-    return testContent;
-  }
-
-  private buildDeleteTestContent(fileContent: string) {
-    let deleteRoutePattern = /router\.delete\(\'.*\'/ig;
-    const deleteRoutes = fileContent.match(deleteRoutePattern) || [];
-    let testContent = '';
-    deleteRoutes.map((route) => {
-      let testRoute = route.split('(')[1];
-      testContent += this.populateDeleteTestContent(testRoute);
-    });
-    return testContent;
-  }
-  private populateGetTestConent(route: string) {
+  private populateGetTestContent(route: string) {
     route = route.replace(/\'/g, '');
     let rootRoute = this.rootRouteContent.slice(0, this.rootRouteContent.length - 1).replace(/\'/g, '');
     if (route.split('/').filter(Boolean).length === 0) {
@@ -179,11 +155,23 @@ it('${route}', async () => {
       }
 
       files.map((file) => {
-        let testFileName = `${file.split('.')[0]}.test.ts`;
+        let fileNameWithExtension = file.split('.');
+        fileNameWithExtension.pop();
+        let testFileName = `${fileNameWithExtension.join('.')}.test.ts`;
         fs.readFile(`${self.currentDir}/${file}`, 'utf8', function (err, fileContent) {
           self.createTestFile(testFileName, fileContent);
         });
       });
+    });
+  }
+
+  generateSingleTest() {
+    const self = this;
+    let fileNameWithExtension = path.basename(this.currentFile).split('.');
+    fileNameWithExtension.pop();
+    let testFileName = `${fileNameWithExtension.join('.')}.test.ts`;
+    fs.readFile(`${this.currentFile}`, 'utf8', function (err, fileContent) {
+      self.createTestFile(testFileName, fileContent);
     });
   }
 }

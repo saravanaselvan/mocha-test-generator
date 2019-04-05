@@ -3,7 +3,7 @@
   "publisher": "Saravanaselvan",
   "displayName": "mocha-test-generator",
   "description": "Generate mocha test from controller files.",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "engines": {
     "vscode": "^1.32.0"
   },
@@ -11,20 +11,26 @@
     "Other"
   ],
   "activationEvents": [
-    "onCommand:extension.generateMochaTest"
+    "onCommand:extension.generateMochaTest",
+    "onCommand:extension.generateMochaTestsForAllFiles"
   ],
   "main": "./out/extension.js",
   "contributes": {
-    "commands": [
-      {
+    "commands": [{
         "command": "extension.generateMochaTest",
         "title": "Generate Mocha Test"
+      },
+      {
+        "command": "extension.generateMochaTestsForAllFiles",
+        "title": "Generate Mocha For All Files"
       }
     ],
     "menus": {
-      "explorer/context": [
-        {
+      "explorer/context": [{
           "command": "extension.generateMochaTest"
+        },
+        {
+          "command": "extension.generateMochaTestsForAllFiles"
         }
       ]
     }

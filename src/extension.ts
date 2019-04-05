@@ -11,26 +11,35 @@ export function activate(context: vscode.ExtensionContext) {
 	// This line of code will only be executed once when your extension is activated
 	console.log('Congratulations, your extension "mocha-test-generator" is now active!');
 
-	if (vscode.window.activeTextEditor) {
-		const currentFileName = vscode.window.activeTextEditor.document.fileName;
-		const currentDir = path.dirname(currentFileName);
-		const fileController = new FileController(currentDir);
-		fileController.generateTests();
-	}
-	// if (!fs.existsSync('../../../test')) {
-	// fs.mkdirSync('test');
-	// }
 	// The command has been defined in the package.json file
 	// Now provide the implementation of the command with registerCommand
 	// The commandId parameter must match the command field in package.json
 	let disposable = vscode.commands.registerCommand('extension.generateMochaTest', () => {
 		// The code you place here will be executed every time your command is executed
+		if (vscode.window.activeTextEditor) {
+			const currentFile = vscode.window.activeTextEditor.document.fileName;
+			const currentDir = path.dirname(currentFile);
+			const fileController = new FileController(currentDir, currentFile);
+			fileController.generateSingleTest();
+		}
 
 		// Display a message box to the user
 		vscode.window.showInformationMessage('Generating Mocha Tests.');
 	});
 
 	context.subscriptions.push(disposable);
+
+	let disposableAllTests = vscode.commands.registerCommand('extension.generateMochaTestsForAllFiles', () => {
+		// The code you place here will be executed every time your command is executed
+		if (vscode.window.activeTextEditor) {
+			const currentFile = vscode.window.activeTextEditor.document.fileName;
+			const currentDir = path.dirname(currentFile);
+			const fileController = new FileController(currentDir, currentFile);
+			fileController.generateTests();
+		}
+	});
+
+	context.subscriptions.push(disposableAllTests);
 }
 
 // this method is called when your extension is deactivated
