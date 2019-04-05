@@ -2,6 +2,7 @@
   "name": "mocha-test-generator",
   "publisher": "Saravanaselvan",
   "displayName": "mocha-test-generator",
+  "icon": "images/mocha.png",
   "description": "Generate mocha test from controller files.",
   "version": "0.1.0",
   "engines": {
