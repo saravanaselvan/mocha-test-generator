@@ -1,10 +1,25 @@
-This Extension is to create mocha test skeleton from express js controller classes.
+**DISCLAIMER:** This Extension is for a personal project. Please use it only if your express js controller follows the given pattern.
 
-It works with the below folder structure:
+This Extension is to create mocha test skeleton from express js written with typescript.
 
-src
-|controller
-|person.controller.ts
-test
+It is helpful to generate mocha tests for express js controllers with the following pattern:
 
-Tests will be created inside test folder.
+```
+export class YourController {
+    public static route = '/rootRoute';
+    public router: Router = Router();
+
+    constructor() {
+        this.router.get('/persons', this.getPersons);
+    }
+}
+```
+There are two options available:
+
+1. Generate Mocha Test:
+
+This will generate a mocha test for the currently opened file and save it inside test folder.
+
+2. Generate Mocha For All Files:
+
+This generates tests for all the files in the current folder. Please use it with care. This will override already written tests inside test folder.

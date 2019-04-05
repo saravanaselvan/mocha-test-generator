@@ -9,7 +9,6 @@ class FileController {
         this.rootRouteContent = '';
         this.importContent = `
 import * as chai from 'chai';
-import { Environment } from './../src/config/environment';
 import { app } from './../src/main';
 import chaiHttp = require('chai-http');
 
