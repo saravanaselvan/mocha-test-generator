@@ -5,7 +5,7 @@
   "description": "Generate mocha test from controller files.",
   "version": "0.1.0",
   "engines": {
-    "vscode": "^1.32.0"
+    "vscode": "^1.25.0"
   },
   "categories": [
     "Other"
