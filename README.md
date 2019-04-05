@@ -20,6 +20,10 @@ There are two options available:
 
 This will generate a mocha test for the currently opened file and save it inside test folder.
 
+``` Ctrl + Shift + P -> Generate Mocha Test```
+
 **Generate Mocha For All Files:**
 
 This generates tests for all the files in the current folder. Please use it with care. This will override already written tests inside test folder.
+
+``` Ctrl + Shift + P -> Generate Mocha For All Files```
